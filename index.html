@@ -1,166 +1,158 @@
 <!DOCTYPE html>
-<html lang="ca">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeurekaLAB - Estimació</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>NeurekaLAB</title>
     <style>
-        /* Estils per a la línia numèrica */
-        #click-area { 
-            touch-action: none; 
-            position: relative; 
-            height: 150px; 
-            display: flex; 
-            align-items: center; 
-            cursor: pointer;
-            width: 100%;
-        }
-        .main-line { height: 4px; width: 100%; background-color: #334155; border-radius: 2px; }
-        .tick { position: absolute; width: 2px; height: 30px; background-color: #334155; }
+        /* CSS PUR - Sense dependre de Tailwind */
+        body { font-family: -apple-system, sans-serif; background-color: #f8fafc; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        #pantalla-inici, #pantalla-joc, #pantalla-final { display: none; flex-direction: column; flex-grow: 1; padding: 20px; text-align: center; justify-content: center; }
+        
+        .card { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .titol { font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; }
+        
+        button { background-color: #2563eb; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 20px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; }
+        button:active { transform: scale(0.98); background-color: #1d4ed8; }
+
+        .numero-gran { font-size: 90px; font-weight: 900; color: #0f172a; margin: 0; }
+        
+        .line-container { position: relative; width: 100%; height: 150px; display: flex; align-items: center; cursor: crosshair; touch-action: none; margin-top: 20px; }
+        .main-line { height: 4px; width: 100%; background: #334155; border-radius: 2px; }
+        .tick { position: absolute; width: 2px; height: 30px; background: #334155; }
+        .labels { display: flex; justify-content: space-between; font-weight: 900; font-size: 24px; color: #cbd5e1; font-style: italic; }
+
+        #btn-final { background-color: #1e293b; margin-top: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+<body>
 
-    <div class="max-w-md mx-auto w-full flex-grow flex flex-col p-6">
+    <!-- 1. PANTALLA INICI -->
+    <div id="pantalla-inici" style="display: flex;">
+        <div class="titol">NeurekaLAB</div>
+        <div class="card">
+            <p style="font-size: 18px; text-align: left; line-height: 1.6; color: #334155;">
+                Veuràs una línia en blanc, entre el 0 i el 100.<br><br>
+                Has de posicionar el nombre que veus en aquesta línia, tan bé i ràpid com puguis.<br><br>
+                Comencem?
+            </p>
+            <button onclick="comencar()">Endavant</button>
+        </div>
+    </div>
+
+    <!-- 2. PANTALLA JOC -->
+    <div id="pantalla-joc">
+        <p style="font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase;">Ubica el número:</p>
+        <h1 id="target-number" class="numero-gran">--</h1>
         
-        <!-- 1. PANTALLA INICIAL -->
-        <div id="pantalla-inici" style="display: flex; flex-direction: column; justify-content: center; flex-grow: 1; text-align: center;">
-            <h1 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-10">NeurekaLAB</h1>
-            <div class="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100">
-                <p class="text-lg font-medium leading-relaxed mb-10 text-slate-700 text-left">
-                    Veuràs una línia en blanc, entre el 0 i el 100. <br><br>
-                    Has de posicionar el nombre que veus en aquesta línia, tan bé i ràpid com puguis. <br><br>
-                    Comencem?
-                </p>
-                <button onclick="comencarProva()" style="background-color: #2563eb; color: white; width: 100%; padding: 1.25rem; border-radius: 1rem; font-weight: 900; font-size: 1.25rem; text-transform: uppercase; font-style: italic; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);">
-                    Endavant
-                </button>
+        <div style="margin-top: 50px;">
+            <div class="labels"><span>0</span><span>100</span></div>
+            <div id="click-area" class="line-container">
+                <div class="main-line"></div>
+                <div class="tick" style="left: 0;"></div>
+                <div class="tick" style="right: 0;"></div>
             </div>
         </div>
+    </div>
 
-        <!-- 2. PANTALLA DE JOC -->
-        <div id="pantalla-joc" style="display: none; flex-direction: column; flex-grow: 1;">
-            <header class="text-center pt-12">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Ubica el número:</p>
-                <div class="h-32 flex items-center justify-center">
-                    <span id="target-number" class="text-8xl font-black text-slate-900 leading-none tracking-tighter">--</span>
-                </div>
-            </header>
-
-            <main class="flex-grow flex flex-col justify-center px-4">
-                <div class="relative">
-                    <div class="flex justify-between mb-4 text-2xl font-black text-slate-300 italic">
-                        <span>0</span>
-                        <span>100</span>
-                    </div>
-                    <div id="click-area">
-                        <div class="main-line"></div>
-                        <div class="tick" style="left: 0;"></div>
-                        <div class="tick" style="right: 0;"></div>
-                    </div>
-                </div>
-            </main>
+    <!-- 3. PANTALLA FINAL -->
+    <div id="pantalla-final">
+        <div class="card">
+            <h2 style="font-weight: 900; font-style: italic; text-transform: uppercase;">Prova finalitzada</h2>
+            <p style="color: #64748b; margin-bottom: 30px;">Les dades s'han registrat correctament.</p>
+            <button onclick="descarregar()">Descarregar CSV</button>
+            <button id="btn-final" onclick="enviarEmail()">Enviar per Email</button>
         </div>
-
-        <!-- 3. PANTALLA DE RESULTATS -->
-        <div id="pantalla-final" style="display: none; flex-direction: column; justify-content: center; flex-grow: 1; text-align: center;">
-            <div class="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100">
-                <h2 class="text-2xl font-black text-slate-800 mb-2 font-italic uppercase italic">Prova finalitzada</h2>
-                <p class="text-sm text-slate-400 mb-10 font-medium">Les dades s'han registrat correctament.</p>
-                
-                <div class="space-y-4">
-                    <button onclick="downloadCSV()" class="w-full bg-slate-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
-                        Descarregar Dades (.csv)
-                    </button>
-                    <button onclick="sendEmail()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
-                        Enviar per Email
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <footer class="text-center py-6">
-            <p class="text-[9px] text-slate-300 font-bold tracking-[0.2em] uppercase italic">By NeurekaLAB</p>
-        </footer>
     </div>
 
     <script>
         let trials = [];
-        let currentTrialIndex = 0;
+        let currentIdx = 0;
         let results = [];
         let startTime = 0;
 
-        // Genera 10 números, un per desena, desordenats, sense 0 ni 100
-        function generateTrials() {
-            let list = [];
-            for (let i = 0; i < 10; i++) {
-                let min = (i * 10);
-                let max = (i * 10) + 9;
-                
-                // Ajustos per no treure 0 ni 100
-                if (min === 0) min = 1;
-                if (max >= 100) max = 99;
-                
-                const num = Math.floor(Math.random() * (max - min + 1)) + min;
-                list.push(num);
+        function generarNumbers() {
+            let n = [];
+            for(let i=0; i<10; i++){
+                let min = (i*10); let max = (i*10)+9;
+                if(min===0) min=1; if(max>=100) max=99;
+                n.push(Math.floor(Math.random() * (max - min + 1)) + min);
             }
-            // Barrejar la llista
-            return list.sort(() => Math.random() - 0.5);
+            return n.sort(() => Math.random() - 0.5);
         }
 
-        function comencarProva() {
-            // Canvi de pantalla directe
+        function comencar() {
             document.getElementById('pantalla-inici').style.display = 'none';
             document.getElementById('pantalla-joc').style.display = 'flex';
-            
-            trials = generateTrials();
-            currentTrialIndex = 0;
+            trials = generarNumbers();
+            currentIdx = 0;
             results = [];
-            
-            nextTrial();
+            següent();
         }
 
-        function nextTrial() {
-            if (currentTrialIndex >= trials.length) {
-                finalitzarProva();
+        function següent() {
+            if (currentIdx >= trials.length) {
+                finalitzar();
                 return;
             }
-            document.getElementById('target-number').innerText = trials[currentTrialIndex];
-            startTime = performance.now();
+            document.getElementById('target-number').innerText = trials[currentIdx];
+            startTime = Date.now();
         }
 
-        // Capturem el clic/toc a la línia
-        document.getElementById('click-area').addEventListener('pointerdown', function(e) {
-            // Evitar clics si la pantalla de joc no és activa
-            if (document.getElementById('pantalla-joc').style.display === 'none') return;
-
-            const reactionTime = performance.now() - startTime;
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            
-            // Percentatge de 0 a 1 segons la posició del clic
-            let percentage = x / rect.width;
-            if (percentage < 0) percentage = 0;
-            if (percentage > 1) percentage = 1;
-            
-            const userGuess = Math.round(percentage * 100);
-            const target = trials[currentTrialIndex];
-
-            // Guardar dades (Sense feedback visual)
-            results.push({
-                intent: currentTrialIndex + 1,
-                target: target,
-                resposta: userGuess,
-                error: Math.abs(target - userGuess),
-                temps_ms: Math.round(reactionTime)
-            });
-
-            currentTrialIndex++;
-            nextTrial();
+        document.getElementById('click-area').addEventListener('mousedown', tractarClic);
+        document.getElementById('click-area').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            tractarClic(e.touches[0]);
         });
 
-        function finalitzarProva() {
+        function tractarClic(e) {
+            if (document.getElementById('pantalla-joc').style.display !== 'flex') return;
+            
+            let temps = Date.now() - startTime;
+            let rect = document.getElementById('click-area').getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            let percent = Math.max(0, Math.min(1, x / rect.width));
+            let guess = Math.round(percent * 100);
+            let target = trials[currentIdx];
+
+            results.push({
+                intent: currentIdx + 1,
+                target: target,
+                resposta: guess,
+                error: Math.abs(target - guess),
+                temps: temps
+            });
+
+            currentIdx++;
+            següent();
+        }
+
+        function finalitzar() {
             document.getElementById('pantalla-joc').style.display = 'none';
             document.getElementById('pantalla-final').style.display = 'flex';
         }
+
+        function getCSV() {
+            let csv = "Intent;Numero;Resposta;Error;Temps_ms\n";
+            results.forEach(r => {
+                csv += r.intent + ";" + r.target + ";" + r.resposta + ";" + r.error + ";" + r.temps + "\n";
+            });
+            return csv;
+        }
+
+        function descarregar() {
+            let blob = new Blob([getCSV()], {type: 'text/csv'});
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "resultats.csv";
+            a.click();
+        }
+
+        function enviarEmail() {
+            let subject = encodeURIComponent("Resultats Estimació");
+            let body = encodeURIComponent(getCSV());
+            window.location.href = "mailto:exemple@neurekalab.com?subject=" + subject + "&body=" + body;
+        }
+    </script>
+</body>
+</html>
