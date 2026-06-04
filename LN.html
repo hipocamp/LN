@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="ca"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Estimació Numèrica - Dades&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.line-container { touch-action: none; position: relative; height: 80px; display: flex; align-items: center; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.main-line { height: 4px; width: 100%; background-color: #334155; border-radius: 2px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.tick { position: absolute; width: 2px; height: 20px; background-color: #334155; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.marker { position: absolute; width: 14px; height: 14px; border-radius: 50%; transform: translate(-50%, -50%); top: 50%; transition: all 0.3s ease-out; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.user-marker { background-color: #3b82f6; z-index: 20; border: 2px solid white; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.correct-marker { background-color: #10b981; z-index: 10; border: 2px solid white; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="max-w-md mx-auto w-full flex-grow flex flex-col p-6"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;header class="text-center mb-6 pt-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span id="trials-count" class="text-[10px] bg-slate-200 px-2 py-1 rounded-full font-bold uppercase"&gt;Intents: 0&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h1 class="text-xs font-bold text-slate-400 uppercase tracking-widest"&gt;Estimació Numèrica&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="target-container" class="bg-white rounded-3xl shadow-xl p-6 border-2 border-blue-500 transition-colors"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-xs font-medium text-slate-500 uppercase mb-1"&gt;Ubica el número:&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span id="target-number" class="text-5xl font-black text-blue-600"&gt;--&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;main class="flex-grow flex flex-col justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="relative px-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex justify-between mb-2 text-sm font-bold text-slate-400"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span&gt;0&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span&gt;100&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="click-area" class="line-container cursor-crosshair"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="main-line"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="tick left-0"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="tick right-0"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="user-marker" class="marker user-marker hidden"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="correct-marker" class="marker correct-marker hidden"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="feedback" class="mt-8 text-center opacity-0 transition-opacity duration-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p id="result-text" class="text-lg font-bold mb-1"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="nextGame()" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg mt-4"&gt;Següent&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- BOTONS DE FINALITZACIÓ --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="mt-auto pt-6 flex gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button onclick="downloadResults()" class="flex-1 bg-white border-2 border-slate-200 text-slate-600 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider"&gt;Descarregar Fitxer&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button onclick="sendByEmail()" class="flex-1 bg-slate-800 text-white py-3 rounded-2xl text-xs font-bold uppercase tracking-wider"&gt;Enviar per Email&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;footer class="text-center py-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="text-[10px] text-slate-300 font-medium tracking-widest uppercase italic"&gt;By NeurekaLAB&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/footer&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let targetValue = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let gameActive = true;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let results = []; // Aquí guardarem tots els intents</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function initGame() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gameActive = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>targetValue = Math.floor(Math.random() * 101);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('target-number').innerText = targetValue;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('user-marker').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('correct-marker').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('feedback').classList.add('opacity-0');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('click-area').addEventListener('pointerdown', function(e) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!gameActive) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gameActive = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const rect = this.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const x = e.clientX - rect.left;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const percentage = Math.max(0, Math.min(1, x / rect.width));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const userGuess = Math.round(percentage * 100);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const error = Math.abs(targetValue - userGuess);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Guardar dades de l'intent</p>
+<p class="p1"><span class="Apple-converted-space">            </span>results.push({</p>
+<p class="p1"><span class="Apple-converted-space">                </span>intent: results.length + 1,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>objectiu: targetValue,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>resposta: userGuess,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>error: error,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>data: new Date().toLocaleTimeString()</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('trials-count').innerText = "Intents: " + results.length;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showResults(userGuess, percentage, error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function showResults(guess, percentage, error) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const userMarker = document.getElementById('user-marker');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const correctMarker = document.getElementById('correct-marker');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>userMarker.style.left = (percentage * 100) + "%";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>userMarker.classList.remove('hidden');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>correctMarker.style.left = (targetValue) + "%";</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>correctMarker.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('feedback').classList.remove('opacity-0');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('result-text').innerText = `Has marcat ${guess} (Error: ${error})`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, 300);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function nextGame() { initGame(); }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- FUNCIONS DE DADES ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function generateCSV() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let csv = "Intent,Objectiu,Resposta,Error,Hora\n";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>results.forEach(r =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>csv += `${r.intent},${r.objectiu},${r.resposta},${r.error},${r.data}\n`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return csv;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function downloadResults() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (results.length === 0) return alert("No hi ha dades.");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const csv = generateCSV();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const blob = new Blob([csv], { type: 'text/csv' });</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const url = window.URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const a = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.setAttribute('hidden', '');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.setAttribute('href', url);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.setAttribute('download', 'resultats_estimacio.csv');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.appendChild(a);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.click();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.body.removeChild(a);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function sendByEmail() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (results.length === 0) return alert("No hi ha dades.");</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const email = "exemple@correu.com"; // CANVIA AIXÒ pel teu email</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const subject = "Resultats Estimació Numèrica - NeurekaLAB";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const body = "Aquí tens els resultats de la sessió:\n\n" + generateCSV();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Això obre el gestor de correu del mòbil/PC amb el text ja posat</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&amp;body=${encodeURIComponent(body)}`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.onload = initGame;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
