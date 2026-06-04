@@ -3,157 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Estimació Numèrica - Dades</title>
+    <title>Estimació Numèrica - NeurekaLAB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .line-container { touch-action: none; position: relative; height: 80px; display: flex; align-items: center; }
+        .line-container { touch-action: none; position: relative; height: 100px; display: flex; align-items: center; }
         .main-line { height: 4px; width: 100%; background-color: #334155; border-radius: 2px; }
-        .tick { position: absolute; width: 2px; height: 20px; background-color: #334155; }
-        .marker { position: absolute; width: 14px; height: 14px; border-radius: 50%; transform: translate(-50%, -50%); top: 50%; transition: all 0.3s ease-out; }
-        .user-marker { background-color: #3b82f6; z-index: 20; border: 2px solid white; }
-        .correct-marker { background-color: #10b981; z-index: 10; border: 2px solid white; }
+        .tick { position: absolute; width: 2px; height: 24px; background-color: #334155; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col overflow-hidden">
 
     <div class="max-w-md mx-auto w-full flex-grow flex flex-col p-6">
         
-        <header class="text-center mb-6 pt-4">
-            <div class="flex justify-between items-center mb-4">
-                <span id="trials-count" class="text-[10px] bg-slate-200 px-2 py-1 rounded-full font-bold uppercase">Intents: 0</span>
-                <h1 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Estimació Numèrica</h1>
+        <!-- 1. PANTALLA INICIAL -->
+        <div id="pantalla-inici" class="flex-grow flex flex-col justify-center text-center fade-in">
+            <h1 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">NeurekaLAB - Recerca</h1>
+            <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+                <p class="text-lg font-medium leading-relaxed mb-8">
+                    Veuràs una línia en blanc, entre el 0 i el 100. <br><br>
+                    Has de posicionar el nombre que veus en aquesta línia, tan bé i ràpid com puguis. <br><br>
+                    Comencem?
+                </p>
+                <button onclick="comencarProva()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-transform uppercase italic">
+                    Endavant
+                </button>
             </div>
-            
-            <div id="target-container" class="bg-white rounded-3xl shadow-xl p-6 border-2 border-blue-500 transition-colors">
-                <p class="text-xs font-medium text-slate-500 uppercase mb-1">Ubica el número:</p>
-                <span id="target-number" class="text-5xl font-black text-blue-600">--</span>
-            </div>
-        </header>
-
-        <main class="flex-grow flex flex-col justify-center">
-            <div class="relative px-4">
-                <div class="flex justify-between mb-2 text-sm font-bold text-slate-400">
-                    <span>0</span>
-                    <span>100</span>
-                </div>
-                <div id="click-area" class="line-container cursor-crosshair">
-                    <div class="main-line"></div>
-                    <div class="tick left-0"></div>
-                    <div class="tick right-0"></div>
-                    <div id="user-marker" class="marker user-marker hidden"></div>
-                    <div id="correct-marker" class="marker correct-marker hidden"></div>
-                </div>
-            </div>
-
-            <div id="feedback" class="mt-8 text-center opacity-0 transition-opacity duration-500">
-                <p id="result-text" class="text-lg font-bold mb-1"></p>
-                <button onclick="nextGame()" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg mt-4">Següent</button>
-            </div>
-        </main>
-
-        <!-- BOTONS DE FINALITZACIÓ -->
-        <div class="mt-auto pt-6 flex gap-2">
-            <button onclick="downloadResults()" class="flex-1 bg-white border-2 border-slate-200 text-slate-600 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider">Descarregar Fitxer</button>
-            <button onclick="sendByEmail()" class="flex-1 bg-slate-800 text-white py-3 rounded-2xl text-xs font-bold uppercase tracking-wider">Enviar per Email</button>
         </div>
 
-        <footer class="text-center py-4">
-            <p class="text-[10px] text-slate-300 font-medium tracking-widest uppercase italic">By NeurekaLAB</p>
-        </footer>
-    </div>
+        <!-- 2. PANTALLA DE JOC (SENSE FEEDBACK) -->
+        <div id="pantalla-joc" class="hidden flex-grow flex flex-col fade-in">
+            <header class="text-center pt-10">
+                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Ubica el número:</p>
+                <div class="h-24 flex items-center justify-center">
+                    <span id="target-number" class="text-7xl font-black text-slate-900 leading-none tracking-tighter">--</span>
+                </div>
+            </header>
 
-    <script>
-        let targetValue = 0;
-        let gameActive = true;
-        let results = []; // Aquí guardarem tots els intents
+            <main class="flex-grow flex flex-col justify-center px-4">
+                <div class="relative">
+                    <div class="flex justify-between mb-4 text-lg font-black text-slate-400 italic">
+                        <span>0</span>
+                        <span>100</span>
+                    </div>
+                    <div id="click-area" class="line-container cursor-pointer">
+                        <div class="main-line"></div>
+                        <div class="tick left-0"></div>
+                        <div class="tick right-0"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
 
-        function initGame() {
-            gameActive = true;
-            targetValue = Math.floor(Math.random() * 101);
-            document.getElementById('target-number').innerText = targetValue;
-            document.getElementById('user-marker').classList.add('hidden');
-            document.getElementById('correct-marker').classList.add('hidden');
-            document.getElementById('feedback').classList.add('opacity-0');
-        }
-
-        document.getElementById('click-area').addEventListener('pointerdown', function(e) {
-            if (!gameActive) return;
-            gameActive = false;
-
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const percentage = Math.max(0, Math.min(1, x / rect.width));
-            const userGuess = Math.round(percentage * 100);
-            const error = Math.abs(targetValue - userGuess);
-
-            // Guardar dades de l'intent
-            results.push({
-                intent: results.length + 1,
-                objectiu: targetValue,
-                resposta: userGuess,
-                error: error,
-                data: new Date().toLocaleTimeString()
-            });
-
-            document.getElementById('trials-count').innerText = "Intents: " + results.length;
-            
-            showResults(userGuess, percentage, error);
-        });
-
-        function showResults(guess, percentage, error) {
-            const userMarker = document.getElementById('user-marker');
-            const correctMarker = document.getElementById('correct-marker');
-            
-            userMarker.style.left = (percentage * 100) + "%";
-            userMarker.classList.remove('hidden');
-            
-            correctMarker.style.left = (targetValue) + "%";
-            
-            setTimeout(() => {
-                correctMarker.classList.remove('hidden');
-                document.getElementById('feedback').classList.remove('opacity-0');
-                document.getElementById('result-text').innerText = `Has marcat ${guess} (Error: ${error})`;
-            }, 300);
-        }
-
-        function nextGame() { initGame(); }
-
-        // --- FUNCIONS DE DADES ---
-
-        function generateCSV() {
-            let csv = "Intent,Objectiu,Resposta,Error,Hora\n";
-            results.forEach(r => {
-                csv += `${r.intent},${r.objectiu},${r.resposta},${r.error},${r.data}\n`;
-            });
-            return csv;
-        }
-
-        function downloadResults() {
-            if (results.length === 0) return alert("No hi ha dades.");
-            const csv = generateCSV();
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'resultats_estimacio.csv');
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function sendByEmail() {
-            if (results.length === 0) return alert("No hi ha dades.");
-            
-            const email = "exemple@correu.com"; // CANVIA AIXÒ pel teu email
-            const subject = "Resultats Estimació Numèrica - NeurekaLAB";
-            const body = "Aquí tens els resultats de la sessió:\n\n" + generateCSV();
-            
-            // Això obre el gestor de correu del mòbil/PC amb el text ja posat
-            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-
-        window.onload = initGame;
-    </script>
-</body>
-</html>
+        <!-- 3. PANTALLA DE RESULTATS -->
+        <div id="pantalla-final" class="hidden flex-grow flex flex-col justify-center text-center fade-in">
+            <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+                <h2 class="text-2xl font-black text-slate-800 mb-2">Prova finalitzada</h2>
+                <p class="text-sm text-slate-500 mb-8 font-medium italic">Gràcies per la teva col·laboració.</p>
+                
+                <div class="space-y-3">
+                    <button onclick="downloadCSV()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold uppercase tracking-widest shadow-lg active:scale-95 transition-transform">
+                        Descarregar Dades (.csv)
+                    </button>
+                    <button onclick="sendEmail(
