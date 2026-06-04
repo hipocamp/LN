@@ -145,4 +145,117 @@
             el.classList.add('active'); userDisp = val; validarForm();
         }
 
-        function valida
+        function validarForm() {
+            const naix = document.getElementById('input-naixement').value;
+            const est = document.getElementById('input-estudis').value;
+            const btn = document.getElementById('btn-comencar');
+            if (userSexe && userDisp && naix && est) {
+                btn.disabled = false; btn.classList.add('ready');
+            } else {
+                btn.disabled = true; btn.classList.remove('ready');
+            }
+        }
+
+        function generarNumbers() {
+            let n = [];
+            for(let i=0; i<10; i++){
+                let min = i*10; let max = (i+1)*10 - 1;
+                if(min === 0) min = 1; if(max >= 100) max = 99;
+                n.push(Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+            return n.sort(() => Math.random() - 0.5);
+        }
+
+        function comencarProva() {
+            document.getElementById('pantalla-perfil').style.display = 'none';
+            document.getElementById('pantalla-joc').style.display = 'flex';
+            trials = generarNumbers();
+            currentIdx = 0;
+            results = [];
+            següentStimul();
+        }
+
+        function següentStimul() {
+            if (currentIdx >= trials.length) {
+                finalitzar();
+                return;
+            }
+            // Mostrar elements
+            document.getElementById('target-number').style.visibility = 'visible';
+            document.getElementById('area-estimacio').style.visibility = 'visible';
+            document.getElementById('label-ubica').style.visibility = 'visible';
+            
+            document.getElementById('target-number').innerText = trials[currentIdx];
+            startTime = performance.now();
+            interactuable = true;
+        }
+
+        const area = document.getElementById('click-area');
+        area.addEventListener('mousedown', tractarClic);
+        area.addEventListener('touchstart', (e) => { e.preventDefault(); tractarClic(e.touches[0]); });
+
+        function tractarClic(e) {
+            if (!interactuable) return;
+            interactuable = false;
+            
+            const tempsMs = Math.round(performance.now() - startTime);
+            const rect = area.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percent = Math.max(0, Math.min(1, x / rect.width));
+            const guess = Math.round(percent * 100);
+            const target = trials[currentIdx];
+
+            results.push({
+                intent: currentIdx + 1,
+                sexe: userSexe,
+                naixement: document.getElementById('input-naixement').value,
+                estudis: document.getElementById('input-estudis').value,
+                dispositiu: userDisp,
+                target: target,
+                resposta: guess,
+                error: Math.abs(target - guess),
+                temps: tempsMs
+            });
+
+            // AMAGAR PANTALLA (Pausa 2 segons)
+            document.getElementById('target-number').style.visibility = 'hidden';
+            document.getElementById('area-estimacio').style.visibility = 'hidden';
+            document.getElementById('label-ubica').style.visibility = 'hidden';
+
+            currentIdx++;
+            
+            setTimeout(() => {
+                següentStimul();
+            }, 2000); // Pausa exacta de 2000 mil·lisegons
+        }
+
+        function finalitzar() {
+            document.getElementById('pantalla-joc').style.display = 'none';
+            document.getElementById('pantalla-final').style.display = 'flex';
+        }
+
+        function getCSV() {
+            let csv = "Intent;Sexe;Data_Naixement;Estudis;Dispositiu;Numero_Demanat;Resposta_Usuari;Error_Absolut;Temps_Reaccio_ms\n";
+            results.forEach(r => {
+                csv += `${r.intent};${r.sexe};${r.naixement};${r.estudis};${r.dispositiu};${r.target};${r.resposta};${r.error};${r.temps}\n`;
+            });
+            return csv;
+        }
+
+        function descarregarCSV() {
+            const blob = new Blob([getCSV()], {type: 'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `resultats_${new Date().getTime()}.csv`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function enviarEmail() {
+            const email = "neurekalab@exemple.com"; 
+            const subject = encodeURIComponent("Dades Investigació NeurekaLAB");
+            const body = encodeURIComponent("Dades de la sessió:\n\n" + getCSV());
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+    </script>
+</body>
+</html>
