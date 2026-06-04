@@ -24,10 +24,11 @@
         .btn-principal.ready { background-color: #2563eb; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
         
         /* Joc - Línia al 85% */
-        .game-header { height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .numero-gran { font-size: 110px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -5px; }
+        .game-header { height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .instruccio-titol { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; height: 15px; }
+        .numero-gran { font-size: 110px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -5px; height: 110px; line-height: 110px; }
         
-        .line-wrapper { width: 85%; margin: 0 auto; position: relative; }
+        .line-wrapper { width: 85%; margin: 0 auto; position: relative; visibility: visible; } /* Sempre visible */
         .line-container { position: relative; width: 100%; height: 160px; display: flex; align-items: center; cursor: crosshair; touch-action: none; }
         .main-line { height: 5px; width: 100%; background: #334155; border-radius: 3px; }
         .tick { position: absolute; width: 2px; height: 35px; background: #334155; }
@@ -97,7 +98,7 @@
     <!-- 3. PANTALLA JOC -->
     <div id="pantalla-joc">
         <div class="game-header">
-            <p id="label-ubica" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Ubica el número:</p>
+            <p id="label-ubica" class="instruccio-titol">Ubica el número:</p>
             <h1 id="target-number" class="numero-gran">--</h1>
         </div>
         
@@ -172,20 +173,22 @@
             trials = generarNumbers();
             currentIdx = 0;
             results = [];
-            següentStimul();
+            
+            // La línia ja és visible per defecte
+            carregarNouNumero();
         }
 
-        function següentStimul() {
+        function carregarNouNumero() {
             if (currentIdx >= trials.length) {
                 finalitzar();
                 return;
             }
-            // Mostrar elements
+            
+            // Mostrar número i etiqueta
+            document.getElementById('target-number').innerText = trials[currentIdx];
             document.getElementById('target-number').style.visibility = 'visible';
-            document.getElementById('area-estimacio').style.visibility = 'visible';
             document.getElementById('label-ubica').style.visibility = 'visible';
             
-            document.getElementById('target-number').innerText = trials[currentIdx];
             startTime = performance.now();
             interactuable = true;
         }
@@ -205,6 +208,7 @@
             const guess = Math.round(percent * 100);
             const target = trials[currentIdx];
 
+            // Guardar dades
             results.push({
                 intent: currentIdx + 1,
                 sexe: userSexe,
@@ -217,16 +221,16 @@
                 temps: tempsMs
             });
 
-            // AMAGAR PANTALLA (Pausa 2 segons)
+            // AMAGAR NOMÉS EL NÚMERO (La línia segueix visible)
             document.getElementById('target-number').style.visibility = 'hidden';
-            document.getElementById('area-estimacio').style.visibility = 'hidden';
             document.getElementById('label-ubica').style.visibility = 'hidden';
 
             currentIdx++;
             
+            // Pausa de 2 segons abans del proper estímul
             setTimeout(() => {
-                següentStimul();
-            }, 2000); // Pausa exacta de 2000 mil·lisegons
+                carregarNouNumero();
+            }, 2000);
         }
 
         function finalitzar() {
@@ -246,7 +250,7 @@
             const blob = new Blob([getCSV()], {type: 'text/csv;charset=utf-8;'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `resultats_${new Date().getTime()}.csv`;
+            a.href = url; a.download = `resultats_neurekalab_${new Date().getTime()}.csv`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
