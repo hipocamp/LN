@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Estimació Numèrica - NeurekaLAB</title>
+    <title>NeurekaLAB - Recerca</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .line-container { touch-action: none; position: relative; height: 100px; display: flex; align-items: center; }
+        .line-container { touch-action: none; position: relative; height: 120px; display: flex; align-items: center; cursor: pointer; }
         .main-line { height: 4px; width: 100%; background-color: #334155; border-radius: 2px; }
         .tick { position: absolute; width: 2px; height: 24px; background-color: #334155; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -19,35 +19,35 @@
         
         <!-- 1. PANTALLA INICIAL -->
         <div id="pantalla-inici" class="flex-grow flex flex-col justify-center text-center fade-in">
-            <h1 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">NeurekaLAB - Recerca</h1>
-            <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
-                <p class="text-lg font-medium leading-relaxed mb-8">
+            <h1 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-10">NeurekaLAB</h1>
+            <div class="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100">
+                <p class="text-lg font-medium leading-relaxed mb-10 text-slate-700">
                     Veuràs una línia en blanc, entre el 0 i el 100. <br><br>
                     Has de posicionar el nombre que veus en aquesta línia, tan bé i ràpid com puguis. <br><br>
                     Comencem?
                 </p>
-                <button onclick="comencarProva()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-transform uppercase italic">
+                <button onclick="comencarProva()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-transform uppercase italic">
                     Endavant
                 </button>
             </div>
         </div>
 
-        <!-- 2. PANTALLA DE JOC (SENSE FEEDBACK) -->
+        <!-- 2. PANTALLA DE JOC -->
         <div id="pantalla-joc" class="hidden flex-grow flex flex-col fade-in">
-            <header class="text-center pt-10">
-                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Ubica el número:</p>
-                <div class="h-24 flex items-center justify-center">
-                    <span id="target-number" class="text-7xl font-black text-slate-900 leading-none tracking-tighter">--</span>
+            <header class="text-center pt-12">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Ubica el número:</p>
+                <div class="h-32 flex items-center justify-center">
+                    <span id="target-number" class="text-8xl font-black text-slate-900 leading-none tabular-nums">--</span>
                 </div>
             </header>
 
             <main class="flex-grow flex flex-col justify-center px-4">
                 <div class="relative">
-                    <div class="flex justify-between mb-4 text-lg font-black text-slate-400 italic">
+                    <div class="flex justify-between mb-4 text-xl font-black text-slate-300 italic">
                         <span>0</span>
                         <span>100</span>
                     </div>
-                    <div id="click-area" class="line-container cursor-pointer">
+                    <div id="click-area" class="line-container">
                         <div class="main-line"></div>
                         <div class="tick left-0"></div>
                         <div class="tick right-0"></div>
@@ -58,12 +58,92 @@
 
         <!-- 3. PANTALLA DE RESULTATS -->
         <div id="pantalla-final" class="hidden flex-grow flex flex-col justify-center text-center fade-in">
-            <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+            <div class="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100">
                 <h2 class="text-2xl font-black text-slate-800 mb-2">Prova finalitzada</h2>
-                <p class="text-sm text-slate-500 mb-8 font-medium italic">Gràcies per la teva col·laboració.</p>
+                <p class="text-sm text-slate-400 mb-10 font-medium italic">Les dades s'han registrat correctament.</p>
                 
-                <div class="space-y-3">
-                    <button onclick="downloadCSV()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold uppercase tracking-widest shadow-lg active:scale-95 transition-transform">
+                <div class="space-y-4">
+                    <button onclick="downloadCSV()" class="w-full bg-slate-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
                         Descarregar Dades (.csv)
                     </button>
-                    <button onclick="sendEmail(
+                    <button onclick="sendEmail()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
+                        Enviar per Email
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center py-6">
+            <p class="text-[9px] text-slate-300 font-bold tracking-[0.2em] uppercase italic">By NeurekaLAB</p>
+        </footer>
+    </div>
+
+    <script>
+        let trials = [];
+        let currentTrialIndex = 0;
+        let results = [];
+        let startTime = 0;
+
+        function generateTrials() {
+            let list = [];
+            for (let i = 0; i < 10; i++) {
+                let min = i * 10;
+                let max = (i + 1) * 10;
+                if (min === 0) min = 1;
+                if (max === 100) max = 99;
+                const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                list.push(num);
+            }
+            return list.sort(() => Math.random() - 0.5);
+        }
+
+        function comencarProva() {
+            // Confirmació interna per verificar que el botó funciona
+            console.log("Iniciant prova...");
+            
+            trials = generateTrials();
+            currentTrialIndex = 0;
+            results = [];
+            
+            document.getElementById('pantalla-inici').style.display = 'none';
+            document.getElementById('pantalla-joc').style.display = 'flex';
+            document.getElementById('pantalla-joc').classList.remove('hidden');
+            
+            nextTrial();
+        }
+
+        function nextTrial() {
+            if (currentTrialIndex >= trials.length) {
+                finalitzarProva();
+                return;
+            }
+            document.getElementById('target-number').innerText = trials[currentTrialIndex];
+            startTime = performance.now();
+        }
+
+        document.getElementById('click-area').addEventListener('pointerdown', function(e) {
+            if (document.getElementById('pantalla-joc').classList.contains('hidden')) return;
+
+            const reactionTime = performance.now() - startTime;
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(1, x / rect.width));
+            const userGuess = Math.round(percentage * 100);
+            const target = trials[currentTrialIndex];
+
+            results.push({
+                intent: currentTrialIndex + 1,
+                target: target,
+                resposta: userGuess,
+                error: Math.abs(target - userGuess),
+                temps_ms: Math.round(reactionTime)
+            });
+
+            currentTrialIndex++;
+            nextTrial();
+        });
+
+        function finalitzarProva() {
+            document.getElementById('pantalla-joc').style.display = 'none';
+            document.getElementById('pantalla-final').style.display = 'flex';
+            document.getElementById('pantalla-fina
