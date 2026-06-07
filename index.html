@@ -8,7 +8,7 @@
         body { font-family: -apple-system, system-ui, sans-serif; background-color: #f8fafc; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: #1e293b; }
         #pantalla-inici, #pantalla-perfil, #pantalla-joc, #pantalla-final { display: none; flex-direction: column; flex-grow: 1; padding: 20px; text-align: center; justify-content: center; overflow-y: auto; }
         
-        /* AVIS D'ORIENTACIÓ */
+        /* AVIS ORIENTACIÓ */
         #orientation-warning {
             display: none; position: fixed; inset: 0; background: #1e293b; color: white; 
             z-index: 2000; flex-direction: column; align-items: center; justify-content: center; 
@@ -107,8 +107,8 @@
     <!-- 3. PANTALLA JOC -->
     <div id="pantalla-joc">
         <div class="game-header">
-            <p id="label-ubica" class="titol-sup">Ubica el número:</p>
-            <h1 id="target-number" class="numero-gran">--</h1>
+            <p id="label-ubica" class="titol-sup" style="visibility: hidden;">Ubica el número:</p>
+            <h1 id="target-number" class="numero-gran" style="visibility: hidden;">--</h1>
         </div>
         <div class="line-wrapper">
             <div class="labels"><span>0</span><span>100</span></div>
@@ -153,8 +153,18 @@
         function comencarProva() {
             document.getElementById('pantalla-perfil').style.display = 'none';
             document.getElementById('pantalla-joc').style.display = 'flex';
-            trials = generarNumbers(); currentIdx = 0; results = [];
-            carregarNouNumero();
+            
+            trials = generarNumbers(); 
+            currentIdx = 0; 
+            results = [];
+            interactuable = false;
+
+            // EL PRIMER ESTÍMUL TAMBÉ TÉ DEMORA:
+            // S'amaga el número i el text, i esperem 2 segons abans de cridar carregarNouNumero()
+            document.getElementById('target-number').style.visibility = 'hidden';
+            document.getElementById('label-ubica').style.visibility = 'hidden';
+            
+            setTimeout(carregarNouNumero, 2000);
         }
 
         function carregarNouNumero() {
@@ -178,25 +188,42 @@
             const x = e.clientX - rect.left;
             const percent = Math.max(0, Math.min(1, x / rect.width));
             const guess = Math.round(percent * 100);
-            results.push({ intent: currentIdx+1, sexe: userSexe, naix: document.getElementById('input-naixement').value, est: document.getElementById('input-estudis').value, disp: userDisp, target: trials[currentIdx], resposta: guess, error: Math.abs(trials[currentIdx] - guess), temps: tempsMs });
+            
+            results.push({ 
+                intent: currentIdx+1, 
+                sexe: userSexe, 
+                naix: document.getElementById('input-naixement').value, 
+                est: document.getElementById('input-estudis').value, 
+                disp: userDisp, 
+                target: trials[currentIdx], 
+                resposta: guess, 
+                error: Math.abs(trials[currentIdx] - guess), 
+                temps: tempsMs 
+            });
+
+            // Amagar número per a la pausa
             document.getElementById('target-number').style.visibility = 'hidden';
             document.getElementById('label-ubica').style.visibility = 'hidden';
+            
             currentIdx++;
             setTimeout(carregarNouNumero, 2000);
         }
 
         function finalitzar() { document.getElementById('pantalla-joc').style.display = 'none'; document.getElementById('pantalla-final').style.display = 'flex'; }
+        
         function getCSV() {
             let csv = "Intent;Sexe;Naixement;Estudis;Dispositiu;Target;Resposta;Error;Temps_ms\n";
             results.forEach(r => { csv += `${r.intent};${r.sexe};${r.naix};${r.est};${r.disp};${r.target};${r.resposta};${r.error};${r.temps}\n`; });
             return csv;
         }
+
         function descarregarCSV() {
             const blob = new Blob([getCSV()], {type: 'text/csv;charset=utf-8;'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = `LN_resultats_${new Date().getTime()}.csv`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
+
         function enviarEmail() {
             window.location.href = `mailto:neurekalab@exemple.com?subject=Resultats LN&body=${encodeURIComponent(getCSV())}`;
         }
