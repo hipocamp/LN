@@ -3,263 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeurekaLAB - Recerca</title>
+    <title>Quixot Evolution - NeurekaLAB</title>
+    
+    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/512/8b4513/don-quixote.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/512/8b4513/don-quixote.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1e293b">
+
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; background-color: #f8fafc; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: #1e293b; }
-        #pantalla-inici, #pantalla-perfil, #pantalla-joc, #pantalla-final { display: none; flex-direction: column; flex-grow: 1; padding: 20px; text-align: center; justify-content: center; overflow-y: auto; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: #fef3c7; font-family: sans-serif; }
+        #joc-container { position: relative; height: 100vh; width: 100vw; display: flex; flex-direction: column; }
         
-        .card { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 420px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .titol-sup { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; }
-        
-        /* Formularis */
-        .form-group { text-align: left; margin-bottom: 15px; }
-        label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; margin-left: 5px; }
-        input, select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #f1f5f9; background: #f8fafc; font-size: 14px; outline: none; box-sizing: border-box; }
-        
-        .selector-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 5px; }
-        .option-btn { background: #f1f5f9; border: 2px solid #e2e8f0; padding: 10px 5px; border-radius: 12px; cursor: pointer; font-size: 10px; font-weight: bold; transition: all 0.2s; text-align: center; }
-        .option-btn.active { background: #dbeafe; border-color: #2563eb; color: #2563eb; transform: scale(1.03); }
+        header { 
+            height: 60px; background: #1e293b; color: white; display: flex; 
+            justify-content: space-between; align-items: center; padding: 0 20px; 
+            box-sizing: border-box; z-index: 10; border-bottom: 3px solid #8b4513;
+        }
+        .stat-label { font-size: 8px; text-transform: uppercase; color: #94a3b8; font-weight: 800; letter-spacing: 1px; }
+        .stat-val { font-size: 20px; font-weight: 900; color: #facc15; }
+        #nivell-tag { background: #dc2626; color: white; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
 
-        .btn-principal { background-color: #cbd5e1; color: white; border: none; padding: 18px; border-radius: 16px; font-size: 16px; font-weight: 900; width: 100%; cursor: not-allowed; text-transform: uppercase; margin-top: 10px; }
-        .btn-principal.ready { background-color: #2563eb; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
-        
-        /* Joc - Línia al 85% fixa */
-        .game-header { height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .instruccio-titol { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-        .numero-gran { font-size: 110px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -5px; line-height: 1; }
-        
-        /* Contenidor de la línia fix al 85% */
-        .line-wrapper { width: 85%; margin: 0 auto; position: relative; }
-        .line-container { position: relative; width: 100%; height: 160px; display: flex; align-items: center; cursor: crosshair; touch-action: none; }
-        .main-line { height: 5px; width: 100%; background: #334155; border-radius: 3px; }
-        .tick { position: absolute; width: 2px; height: 35px; background: #334155; }
-        .labels { display: flex; justify-content: space-between; font-weight: 900; font-size: 32px; color: #cbd5e1; font-style: italic; margin-bottom: -20px; }
+        canvas { background-color: #bae6fd; flex-grow: 1; touch-action: none; }
 
-        .btn-final { background-color: #1e293b; margin-top: 10px; padding: 16px; border-radius: 14px; color: white; width: 100%; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        /* AVIS D'ORIENTACIÓ */
+        #orientation-warning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #1e293b;
+            color: white;
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .phone-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            animation: rotatePhone 2s infinite;
+        }
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Detectar si està en vertical en mòbils/tablets */
+        @media (orientation: portrait) {
+            #orientation-warning { display: flex; }
+        }
+
+        #game-over { 
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); 
+            color: white; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 100; text-align: center; backdrop-filter: blur(10px);
+        }
+        .btn-restart { 
+            background: #2563eb; color: white; border: none; padding: 18px 45px; 
+            border-radius: 50px; font-weight: 900; font-size: 18px; cursor: pointer; 
+            margin-top: 25px; box-shadow: 0 8px 0 #1e40af;
+        }
+
+        footer { position: absolute; bottom: 10px; width: 100%; text-align: center; font-size: 9px; color: #64748b; font-weight: bold; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <!-- 1. PANTALLA INICI -->
-    <div id="pantalla-inici" style="display: flex;">
-        <div class="titol-sup">NeurekaLAB</div>
-        <div class="card">
-            <p style="font-size: 18px; text-align: left; line-height: 1.6; color: #334155; margin-bottom: 30px;">
-                Veuràs una línia en blanc, entre el 0 i el 100.<br><br>
-                Has de posicionar el nombre que veus en aquesta línia, tan bé i ràpid com puguis.
-            </p>
-            <button class="btn-principal ready" onclick="anarAPerfil()">Endavant</button>
-        </div>
+    <!-- MISSATGE PER GIRAR EL MÒBIL -->
+    <div id="orientation-warning">
+        <div class="phone-icon">📱🔄</div>
+        <h2 style="font-style: italic;">GIRA EL DISPOSITIU</h2>
+        <p style="color: #94a3b8; font-size: 14px;">Per poder lluitar contra els molins, has de posar la pantalla en <b>horitzontal</b>.</p>
     </div>
 
-    <!-- 2. PANTALLA PERFIL -->
-    <div id="pantalla-perfil">
-        <div class="titol-sup">Perfil de l'usuari</div>
-        <div class="card">
-            <div class="form-group">
-                <label>Sexe</label>
-                <div class="selector-group" style="grid-template-columns: 1fr 1fr;">
-                    <div class="option-btn sexe-opt" onclick="selectSexe(this, 'Masculi')">Masculí</div>
-                    <div class="option-btn sexe-opt" onclick="selectSexe(this, 'Femeni')">Femení</div>
-                </div>
+    <div id="joc-container">
+        <header>
+            <div class="text-left">
+                <p class="stat-label">Punts</p>
+                <span id="val-punts" class="stat-val">0</span>
             </div>
-            <div class="form-group">
-                <label>Data de naixement</label>
-                <input type="date" id="input-naixement" onchange="validarForm()">
+            <div class="text-center">
+                <div id="val-vides" style="font-size: 20px;">❤️❤️❤️</div>
+                <div id="nivell-tag">NIVELL 1</div>
             </div>
-            <div class="form-group">
-                <label>Nivell d'estudis</label>
-                <select id="input-estudis" onchange="validarForm()">
-                    <option value="">Selecciona...</option>
-                    <option value="1r ESO">1r ESO</option>
-                    <option value="2n ESO">2n ESO</option>
-                    <option value="3r ESO">3r ESO</option>
-                    <option value="4t ESO">4t ESO</option>
-                    <option value="1r Batxillerat">1r Batxillerat</option>
-                    <option value="2n Batxillerat">2n Batxillerat</option>
-                    <option value="1r Grau Mig">1r Grau Mig</option>
-                    <option value="2n Grau Mig">2n Grau Mig</option>
-                    <option value="Universitari">Estudiant universitari</option>
-                    <option value="Grau Superior">Estudiant grau superior</option>
-                    <option value="Graduat">Graduat</option>
-                </select>
+            <div style="text-align: right;">
+                <p class="stat-label">Rècord</p>
+                <span id="val-record" class="stat-val">0</span>
             </div>
-            <div class="form-group">
-                <label>Dispositiu</label>
-                <div class="selector-group">
-                    <div class="option-btn disp-opt" onclick="selectDisp(this, 'Mobil')">📱 Mòbil</div>
-                    <div class="option-btn disp-opt" onclick="selectDisp(this, 'Tablet')">📟 Tablet</div>
-                    <div class="option-btn disp-opt" onclick="selectDisp(this, 'PC')">💻 PC</div>
-                </div>
-            </div>
-            <button id="btn-comencar" class="btn-principal" onclick="comencarProva()" disabled>Començar</button>
-        </div>
-    </div>
+        </header>
 
-    <!-- 3. PANTALLA JOC -->
-    <div id="pantalla-joc">
-        <div id="estimul-container" class="game-header">
-            <p id="label-ubica" class="instruccio-titol">Ubica el número:</p>
-            <h1 id="target-number" class="numero-gran">--</h1>
-        </div>
-        
-        <div id="area-estimacio" class="line-wrapper">
-            <div class="labels"><span>0</span><span>100</span></div>
-            <div id="click-area" class="line-container">
-                <div class="main-line"></div>
-                <div class="tick" style="left: 0;"></div>
-                <div class="tick" style="right: 0;"></div>
-            </div>
-        </div>
-    </div>
+        <canvas id="jocCanvas"></canvas>
 
-    <!-- 4. PANTALLA FINAL -->
-    <div id="pantalla-final">
-        <div class="card">
-            <h2 style="font-weight: 900; font-style: italic; text-transform: uppercase; margin-bottom: 5px;">Prova finalitzada</h2>
-            <p style="color: #64748b; font-size: 13px; margin-bottom: 30px;">Dades registrades correctament.</p>
-            <button class="btn-final" style="background-color: #2563eb;" onclick="descarregarCSV()">Descarregar CSV</button>
-            <button class="btn-final" onclick="enviarEmail()">Enviar per Email</button>
+        <div id="game-over">
+            <h2 style="font-size: 32px; font-weight: 900; font-style: italic; color: #f87171; margin: 0;">BATALLA ACABADA</h2>
+            <div style="margin: 20px 0; border: 2px solid #334155; padding: 20px; border-radius: 30px; background: rgba(255,255,255,0.05); width: 180px;">
+                <p id="punts-finals" style="font-size: 50px; font-weight: 900; margin: 0;">0</p>
+                <p style="font-size: 10px; color: #94a3b8; font-weight: bold;">PUNTS</p>
+            </div>
+            <button onclick="reiniciar()" class="btn-restart">REINTENTAR</button>
         </div>
+
+        <footer>By NeurekaLAB</footer>
     </div>
 
     <script>
-        let trials = [];
-        let currentIdx = 0;
-        let results = [];
-        let startTime = 0;
-        let userSexe = "";
-        let userDisp = "";
-        let interactuable = false;
+        const canvas = document.getElementById("jocCanvas");
+        const ctx = canvas.getContext("2d");
+        const overlay = document.getElementById("game-over");
 
-        function anarAPerfil() {
-            document.getElementById('pantalla-inici').style.display = 'none';
-            document.getElementById('pantalla-perfil').style.display = 'flex';
+        let puntuacio = 0;
+        let vides = 3;
+        let jocActiu = true;
+        let tempsInici = Date.now();
+        let nivell = 1;
+        let record = localStorage.getItem("quixot_progressive_record") || 0;
+        document.getElementById("val-record").innerText = record;
+
+        function ajustarMida() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 60;
+        }
+        window.addEventListener('resize', () => {
+            ajustarMida();
+            // Si canviem d'orientació, el joc ha de saber on és el Quixot ara
+            quixot.y = canvas.height - 80;
+        });
+        ajustarMida();
+
+        let spawnProb = 0.012; 
+        let moliSpeedMin = 1.8;
+        let moliSpeedMax = 3.5;
+
+        const quixot = { x: canvas.width / 2 - 30, y: canvas.height - 80, w: 60, h: 60, isDragging: false };
+        let llances = [];
+        let molins = [];
+        let angleAspes = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            const touchY = e.touches[0].clientY;
+            if (touchY > canvas.height * 0.5) {
+                quixot.isDragging = true;
+            }
+            disparar();
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (quixot.isDragging && jocActiu) {
+                const touchX = e.touches[0].clientX;
+                quixot.x = touchX - quixot.w / 2;
+                if (quixot.x < 0) quixot.x = 0;
+                if (quixot.x > canvas.width - quixot.w) quixot.x = canvas.width - quixot.w;
+            }
+        });
+
+        canvas.addEventListener('touchend', () => { quixot.isDragging = false; });
+        canvas.addEventListener('mousedown', disparar);
+
+        function disparar() {
+            if (!jocActiu) return;
+            llances.push({ x: quixot.x + 27, y: quixot.y, w: 5, h: 25 });
         }
 
-        function selectSexe(el, val) {
-            document.querySelectorAll('.sexe-opt').forEach(b => b.classList.remove('active'));
-            el.classList.add('active'); userSexe = val; validarForm();
+        function dibuixarQuixot(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = "#5d4037";
+            ctx.beginPath();
+            ctx.roundRect(10, 35, 40, 20, 8); ctx.fill(); 
+            ctx.fillRect(40, 22, 10, 18); 
+            ctx.fillStyle = "#374151";
+            ctx.fillRect(20, 12, 15, 25); 
+            ctx.fillStyle = "#f3f4f6";
+            ctx.beginPath();
+            ctx.arc(27, 8, 8, 0, Math.PI * 2); ctx.fill(); 
+            ctx.strokeStyle = "#94a3b8";
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(35, 20); ctx.lineTo(55, -10); ctx.stroke();
+            ctx.restore();
         }
 
-        function selectDisp(el, val) {
-            document.querySelectorAll('.disp-opt').forEach(b => b.classList.remove('active'));
-            el.classList.add('active'); userDisp = val; validarForm();
+        function dibuixarMoli(m) {
+            ctx.save();
+            ctx.translate(m.x + m.w/2, m.y + m.h/2);
+            ctx.fillStyle = "#f8fafc";
+            ctx.beginPath();
+            ctx.moveTo(-10, 15); ctx.lineTo(10, 15); ctx.lineTo(8, -12); ctx.lineTo(-8, -12); ctx.fill();
+            ctx.fillStyle = "#78350f";
+            ctx.beginPath(); ctx.moveTo(-11, -12); ctx.lineTo(11, -12); ctx.lineTo(0, -20); ctx.fill();
+            ctx.rotate(angleAspes);
+            ctx.strokeStyle = "#475569";
+            ctx.lineWidth = 2.5;
+            for(let i=0; i<4; i++) {
+                ctx.rotate(Math.PI/2);
+                ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, 18); ctx.stroke();
+                ctx.fillStyle = "rgba(255,255,255,0.7)";
+                ctx.fillRect(-3, 8, 6, 10);
+            }
+            ctx.restore();
         }
 
-        function validarForm() {
-            const naix = document.getElementById('input-naixement').value;
-            const est = document.getElementById('input-estudis').value;
-            const btn = document.getElementById('btn-comencar');
-            if (userSexe && userDisp && naix && est) {
-                btn.disabled = false; btn.classList.add('ready');
-            } else {
-                btn.disabled = true; btn.classList.remove('ready');
+        function actualitzarDificultat() {
+            let tempsTranscorregut = (Date.now() - tempsInici) / 1000;
+            let nouNivell = Math.floor(tempsTranscorregut / 30) + 1;
+            if (nouNivell !== nivell) {
+                nivell = nouNivell;
+                document.getElementById("nivell-tag").innerText = "NIVELL " + nivell;
+                spawnProb += 0.006;
+                moliSpeedMin += 0.5;
+                moliSpeedMax += 0.6;
             }
         }
 
-        function generarNumbers() {
-            let n = [];
-            for(let i=0; i<10; i++){
-                let min = i*10; let max = (i+1)*10 - 1;
-                if(min === 0) min = 1; if(max >= 100) max = 99;
-                n.push(Math.floor(Math.random() * (max - min + 1)) + min);
+        function perdreVida() {
+            vides--;
+            document.getElementById("val-vides").innerText = "❤️".repeat(vides);
+            if (vides <= 0) finalitzarJoc();
+        }
+
+        function finalitzarJoc() {
+            jocActiu = false;
+            if (puntuacio > record) {
+                record = puntuacio;
+                localStorage.setItem("quixot_progressive_record", record);
             }
-            return n.sort(() => Math.random() - 0.5);
+            document.getElementById("punts-finals").innerText = puntuacio;
+            overlay.style.display = "flex";
         }
 
-        function comencarProva() {
-            document.getElementById('pantalla-perfil').style.display = 'none';
-            document.getElementById('pantalla-joc').style.display = 'flex';
-            trials = generarNumbers();
-            currentIdx = 0;
-            results = [];
-            
-            // La línia és visible SEMPRE dins de pantalla-joc
-            carregarNouNumero();
+        function reiniciar() {
+            puntuacio = 0; vides = 3; llances = []; molins = []; nivell = 1;
+            tempsInici = Date.now();
+            spawnProb = 0.012; moliSpeedMin = 1.8; moliSpeedMax = 3.5;
+            document.getElementById("val-punts").innerText = "0";
+            document.getElementById("val-vides").innerText = "❤️❤️❤️";
+            document.getElementById("nivell-tag").innerText = "NIVELL 1";
+            overlay.style.display = "none";
+            jocActiu = true;
+            bucle();
         }
 
-        function carregarNouNumero() {
-            if (currentIdx >= trials.length) {
-                finalitzar();
-                return;
+        function bucle() {
+            if (!jocActiu) return;
+            actualitzarDificultat();
+            quixot.y = canvas.height - 80;
+            angleAspes += 0.03 + (nivell * 0.01);
+
+            if (Math.random() < spawnProb) {
+                molins.push({ x: Math.random() * (canvas.width - 25), y: -50, w: 25, h: 40, v: moliSpeedMin + Math.random() * (moliSpeedMax - moliSpeedMin) });
             }
-            
-            // Posem el número i el fem visible
-            document.getElementById('target-number').innerText = trials[currentIdx];
-            document.getElementById('estimul-container').style.visibility = 'visible';
-            
-            startTime = performance.now();
-            interactuable = true;
-        }
 
-        const area = document.getElementById('click-area');
-        area.addEventListener('mousedown', tractarClic);
-        area.addEventListener('touchstart', (e) => { e.preventDefault(); tractarClic(e.touches[0]); });
-
-        function tractarClic(e) {
-            if (!interactuable) return;
-            interactuable = false;
-            
-            const tempsMs = Math.round(performance.now() - startTime);
-            const rect = area.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const percent = Math.max(0, Math.min(1, x / rect.width));
-            const guess = Math.round(percent * 100);
-            const target = trials[currentIdx];
-
-            // Guardar dades
-            results.push({
-                intent: currentIdx + 1,
-                sexe: userSexe,
-                naixement: document.getElementById('input-naixement').value,
-                estudis: document.getElementById('input-estudis').value,
-                dispositiu: userDisp,
-                target: target,
-                resposta: guess,
-                error: Math.abs(target - guess),
-                temps: tempsMs
+            llances.forEach((l, i) => {
+                l.y -= 10;
+                if (l.y < -50) llances.splice(i, 1);
             });
 
-            // AMAGUEM NOMÉS EL CONTENIDOR DE L'ESTÍMUL (Número i text)
-            // La línia (area-estimacio) NO es toca, segueix visible.
-            document.getElementById('estimul-container').style.visibility = 'hidden';
-
-            currentIdx++;
-            
-            // Pausa de 2 segons mantenint la línia a la vista
-            setTimeout(() => {
-                carregarNouNumero();
-            }, 2000);
-        }
-
-        function finalitzar() {
-            document.getElementById('pantalla-joc').style.display = 'none';
-            document.getElementById('pantalla-final').style.display = 'flex';
-        }
-
-        function getCSV() {
-            let csv = "Intent;Sexe;Data_Naixement;Estudis;Dispositiu;Numero_Demanat;Resposta_Usuari;Error_Absolut;Temps_Reaccio_ms\n";
-            results.forEach(r => {
-                csv += `${r.intent};${r.sexe};${r.naixement};${r.estudis};${r.dispositiu};${r.target};${r.resposta};${r.error};${r.temps}\n`;
+            molins.forEach((m, i) => {
+                m.y += m.v;
+                if (m.y > canvas.height) molins.splice(i, 1);
+                if (m.y + m.h > quixot.y + 15 && m.x < quixot.x + quixot.w - 10 && m.x + m.w > quixot.x + 10) {
+                    molins.splice(i, 1); perdreVida();
+                }
+                llances.forEach((l, li) => {
+                    if (l.x < m.x + m.w && l.x + l.w > m.x && l.y < m.y + m.h && l.y + l.h > m.y) {
+                        molins.splice(i, 1); llances.splice(li, 1);
+                        puntuacio += 5; document.getElementById("val-punts").innerText = puntuacio;
+                    }
+                });
             });
-            return csv;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#a16207";
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+            dibuixarQuixot(quixot.x, quixot.y);
+            ctx.fillStyle = "#ef4444";
+            llances.forEach(l => { ctx.beginPath(); ctx.roundRect(l.x, l.y, l.w, l.h, 2); ctx.fill(); });
+            molins.forEach(m => dibuixarMoli(m));
+            requestAnimationFrame(bucle);
         }
 
-        function descarregarCSV() {
-            const blob = new Blob([getCSV()], {type: 'text/csv;charset=utf-8;'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `resultats_neurekalab_${new Date().getTime()}.csv`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        function enviarEmail() {
-            const email = "neurekalab@exemple.com"; 
-            const subject = encodeURIComponent("Dades Investigació NeurekaLAB");
-            const body = encodeURIComponent("Dades de la sessió:\n\n" + getCSV());
-            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-        }
+        bucle();
     </script>
 </body>
 </html>
